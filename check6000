@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for ((i=1;i<=1000;i++)); do
+  echo "No Connection!"
+  lsof -i4 | grep 6000
+done

@@ -1,0 +1,48 @@
+#!/bin/bash
+# first do a reasonable good anarchy linux install
+# and install the packages you need from there
+# But we need some more...
+
+sudo pacman -Syyu
+
+echo "Installing arch packages..." 
+sudo pacman -S \
+	nitrogen obconf gtk2-perl alacritty exa ripgrep \
+	figlet fortune-mod neofetch bash curl mlocate \
+	ctags zip xz jq whois lsof file nim llvm \
+	rmlint tmux tree qbittorrent tint2 plank \
+	thunderbird
+
+echo "Installing aur packages..." 
+echo "Installing yay aur helper..."
+[[ ! -d "$HOME/builds" ]]; mkdir -p "$HOME/builds"
+git clone https://aur.archlinux.org/yay $HOME/builds/yay
+cd $HOME/builds/yay
+makepkg -si
+cd -
+yay -S \
+	picom-git gnvim adobe-source-code-pro-fonts \
+	obmenu-generator
+  # visual-studio-code-bin ulauncher
+
+echo "Creating mlocate indexdb"
+sudo updatedb
+
+echo "Generating dynamic openbox menu with icons"
+obmenu-generator -p -i
+openbox --reconfigure
+
+# echo "Installing virt-manager..."
+# sudo pacman -S \
+# 	virt-manager qemu \
+# 	libvirt dmidecode ebtables dnsmasq
+# sudo usermod -aG libvirt $USER
+
+
+echo "Cleaning system..."
+sudo pacman -Scc
+sudo pacman -Rns $(sudo pacman -Qdtq)
+sudo rm -rf $HOME/.cache/*
+
+echo "Now you can start configuring your dev environment and import your dotfiles"
+
