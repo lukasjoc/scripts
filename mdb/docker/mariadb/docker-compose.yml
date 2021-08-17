@@ -1,0 +1,16 @@
+---
+version: "3.7"
+
+volumes:
+  mariadb_data:
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb_managed_local
+    restart: always
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_HOST=localhost

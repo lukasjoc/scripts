@@ -1,0 +1,13 @@
+---
+version: "3.7"
+services:
+  mssql-server:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: mssql_managed_local
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "4%*8UtWH*V"
+    ports:
+      - "1433:1433"
+

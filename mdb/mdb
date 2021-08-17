@@ -1,0 +1,124 @@
+#!/bin/bash
+set -u
+
+declare -a SUPPORTED_DB=(
+	"mysql"
+	"mariadb"
+	"postgres"
+	"mssql"
+)
+
+list() {
+	echo -e "Supported databases: \n"
+	for dir in ${SUPPORTED_DB[*]}; do echo "$dir"; done
+}
+
+up() {
+	local LOCAL_DB LOCAL_DB_PATH
+	LOCAL_DB=$1
+	LOCAL_DB_PATH=$HOME/.local/share/mdb/docker/$LOCAL_DB
+
+	# if not supported return error
+	if [[ ! ${SUPPORTED_DB[*]} =~ ${LOCAL_DB} ]]; then
+		echo "database not supported. Spawn an issue to https://github.com/lukasjoc/mdb/issues"
+		return 1
+	fi
+
+	# go to path and compose new database
+	cd "$LOCAL_DB_PATH" || return 1
+	docker-compose up --build -d
+	cd - || return 1
+}
+
+stop() {
+	local LOCAL_DB LOCAL_DB_PATH
+	LOCAL_DB=$1
+	LOCAL_DB_PATH=$HOME/.local/share/mdb/docker/$LOCAL_DB
+
+	# check if currently running
+	if [[ ! $(docker container ls | grep "${LOCAL_DB}_managed_local") ]]; then
+		echo "$1_managed_local not running. can't be stopped now"
+		return 1
+	fi
+
+	# compose down
+	cd "$LOCAL_DB_PATH" || return 1
+	docker-compose down -v
+	cd - || return 1
+}
+
+# check for active database containers (must not guarantee that they work)
+active() {
+	local CONTAINER_NAME_IDENTIFIER
+	CONTAINER_NAME_IDENTIFIER=_managed_local
+	if [[ $(docker container ls | grep "$CONTAINER_NAME_IDENTIFIER") ]]; then
+		docker container ls | grep "$CONTAINER_NAME_IDENTIFIER"
+	else
+		echo "currently no active databases running"
+	fi
+}
+
+exec_shell() {
+	local LOCAL_DB CONTAINER_NAME
+	LOCAL_DB=$1
+	CONTAINER_NAME=${1}_managed_local
+	
+
+	# check if currently running
+	if [[ ! $(docker container ls | grep "${LOCAL_DB}_managed_local") ]]; then
+		echo "$1_managed_local not running. can't be execed to"
+		return 1
+	fi
+
+	case "$LOCAL_DB" in
+		mysql|mariadb) docker exec -it "$CONTAINER_NAME" /usr/bin/mysql -uroot; return ;;
+		mssql) docker exec -it "$CONTAINER_NAME" /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 4%*8UtWH*V; return;;
+		postgres) docker exec -it "$CONTAINER_NAME" /usr/local/bin/psql -Udefault; return ;;
+		*) echo "could process the shell for this active container. Spawn an isssue to https://github.com/lukasjoc/mdb/issues"; return 1;;
+	esac
+}
+
+# print current version of this srcipt
+print_version() { echo "mdb version v0.2"; }
+
+# print usage information
+print_usage() {
+	cat <<EOF
+Manage database deployments for dockerized dev systems
+
+ Usage:
+  mdb [flags]
+  mdb [command]
+	
+ Commands:
+  list, ls    list all supported databases
+  up, start   start a given database container
+  down, stop  stop and remove the database container
+  active      print all active database containers
+  exec        get a database shell in the database container
+
+ Flags:
+  -v, --version   print the version number of this script
+  -h, --help      print the help message of this script
+	
+Use "mdb -(-h)elp" for more information about this script.
+EOF
+	}
+
+# print help if zero args are given
+if [[ "$#" == "0" ]]; then print_usage; fi
+
+# unprocessed_args=()
+while [[ "$#" -ne 0 ]]; do
+	case "$1" in
+		list|ls) list; exit 0;;
+		active) active; exit 0;;
+		up|start) up "$2"; exit 0;;
+		down|stop) stop "$2"; exit 0;;
+		exec) exec_shell "$2"; exit 0;;
+		-h|--help) print_usage; exit 0;; # print help
+		-v|--version) print_version; exit 0;; # print version
+		*) print_usage; exit 1;; # print usage if command, flag not processable
+	esac
+	shift
+done
