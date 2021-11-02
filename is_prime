@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 
-
 __EXPL__="""
 How it works?:
     just the **naive** check for simplicity
@@ -27,7 +26,7 @@ def main(args=None):
 
 if __name__ == "__main__":
 
-    ___VERSION__ = "0.1.1"
+    __VERSION__ = "0.1.2"
 
     if len(sys.argv) <= 1:
         print()
@@ -42,9 +41,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if sys.argv[1] in ("-v", "-V"):
-        print(f"is_prime version: v{__VERSION___}")
-
-
+        print(f"is_prime version: v{__VERSION__}")
+        sys.exit(0)
 
     if len(sys.argv) > 2:
         print("Just one number or a single argument please!!")
