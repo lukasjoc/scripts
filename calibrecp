@@ -6,7 +6,7 @@ EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
 
-# INFO: this is not save code
+# INFO: this is not save code :)
 def main(args) -> int:
     file = args[1]
     remote = "lukasjoc@192.168.178.28"

@@ -10,7 +10,7 @@ i=1
 declare -a options
 declare -a raw_options
 while read -r line; do
-    program_name=$(echo $line | grep -oP ".+(?=\/)")
+    program_name=$(echo "$line" | grep -oP ".+(?=\/)")
     options+=("$i" "$program_name" off)
     raw_options+=("$program_name")
     let "i=i+1"
@@ -30,7 +30,7 @@ clear
 for choice in ${choices[@]}; do
     purge_program=${raw_options[(($choice-1))]}
     echo "Purgeing: $purge_program"
-    yes | sudo apt-get purge $purge_program
+    yes | sudo apt-get purge "$purge_program"
     echo "Cleaning"
     yes | sudo apt autoremove
     yes | sudo apt autoclean

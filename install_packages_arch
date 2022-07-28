@@ -16,10 +16,10 @@ sudo pacman -S \
 echo "Installing aur packages..." 
 echo "Installing yay aur helper..."
 [[ ! -d "$HOME/builds" ]]; mkdir -p "$HOME/builds"
-git clone https://aur.archlinux.org/yay $HOME/builds/yay
-cd $HOME/builds/yay
+git clone https://aur.archlinux.org/yay "$HOME"/builds/yay
+cd "$HOME"/builds/yay || exit
 makepkg -si
-cd -
+cd - || exit
 yay -S \
 	picom-git gnvim adobe-source-code-pro-fonts \
 	obmenu-generator
@@ -42,7 +42,7 @@ openbox --reconfigure
 echo "Cleaning system..."
 sudo pacman -Scc
 sudo pacman -Rns $(sudo pacman -Qdtq)
-sudo rm -rf $HOME/.cache/*
+sudo rm -rf "$HOME"/.cache/*
 
 echo "Now you can start configuring your dev environment and import your dotfiles"
 

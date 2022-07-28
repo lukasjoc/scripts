@@ -1,9 +1,0 @@
-!#/bin/bash
-
-# Here:
-# $HOME/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books
-
-# Create a simlink in $HOME and your done
-
-ln -s  $HOME/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books books
- 

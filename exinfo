@@ -1,4 +1,0 @@
-#!/bin/bash
-
-cat $HOME/.local/bin/scripts/exinfo_text
-
