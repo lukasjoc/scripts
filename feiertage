@@ -2,6 +2,7 @@
 
 import argparse
 from argparse import ArgumentTypeError
+import termcolor
 from datetime import datetime
 import json
 import os
@@ -14,12 +15,12 @@ from tabulate import tabulate
 
 def main(args) -> int:
     cachepath = platformdirs.user_cache_path(appname="feiertage")
-    if not cachepath.exists():
-        cachepath.mkdir()
+    if not cachepath.exists(): cachepath.mkdir()
 
     cachefile = cachepath.joinpath(f"{args.year}-{args.state}.json")
     data = None
     if not cachefile.exists():
+        print("[INFO]: Fetching from feiertage-api.de", end="\n\n")
         api_url = f"https://feiertage-api.de/api/?jahr={args.year}&nur_land={args.state}"
         req = requests.get(api_url)
         if req.status_code != 200:
@@ -30,30 +31,51 @@ def main(args) -> int:
             json.dump(data, f, indent=2)
 
     if not data:
+        print(f"[INFO]: Reading from cache {cachefile}", end="\n\n")
         with cachefile.open("r+") as f:
             data = json.load(f)
 
+
+    # Rendering the table and handle other options
     rows = []
-    for day, info in data.items():
-        d = datetime.strptime(info.get("datum"), "%Y-%m-%d").strftime("%d.%m.%Y")
+    for name, info in data.items():
+        date = datetime.strptime(info.get("datum"), "%Y-%m-%d").date()
         notice = info.get("hinweis")
-        rows.append([notice if notice else "-", day, d])
+        rows.append([notice if notice else "-", name, date])
 
     if args.notice:
         if args.notice > len(rows): return 1
-        nr = args.notice
-        if (nr == len(rows)): nr = len(rows)-1
-        if (nr == 0): nr = 0
-        print(rows[nr][0])
+        an = args.notice
+        if an == len(rows): an = len(rows)-1
+        print(rows[an][0])
         return 0
 
+    table_rows = []
+    current  = datetime.now().date()
+    next_found = False
+    for [notice, name, date] in rows:
+        formatted = date.strftime("%d.%m.%Y")
+        if date < current:
+            formatted = termcolor.colored(formatted, "white", attrs=["dark"])
+        elif date > current and not next_found and date.year == current.year:
+            next_found = True
+            formatted = termcolor.colored(formatted, "white", attrs=["bold"])
+
+        mark = termcolor.colored("!", "white", attrs=["bold"])
+        emty = termcolor.colored("-", "white", attrs=["dark"])
+        notice_formatted = f"[{mark}]" if notice != "-" else emty
+        table_rows.append([ notice_formatted, name, formatted])
+
     table = tabulate(
-        [["[!]" if r[0] != "-" else r[0], r[1], r[2]] for r in rows],
-        headers=["Nr.", "Hinweis", "Name", "Datum"],
+        table_rows,
+        headers=["Index", "Hinweis", "Name", "Datum"],
         showindex=True,
+        disable_numparse=True,
+        tablefmt="plain",
     )
 
-    print(table)
+    termcolor.cprint(table)
+    ###
 
     return 0
 
@@ -63,11 +85,11 @@ if __name__ == "__main__":
         states = ["NATIONAL", "BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP",
             "SL", "SN", "ST", "SH", "TH"]
         if state_code not in states:
-            raise ArgumentTypeError(f"{state_code} is not a valid German state code")
+            raise ArgumentTypeError(f"{state_code} is not a valid german state code")
         return state_code
 
     argparse = argparse.ArgumentParser()
-    argparse.add_argument("--state",  type=validate_state_code, help="a two-letter code representing a German federal state", default="BY")
+    argparse.add_argument("--state",  type=validate_state_code, help="a two-letter code representing a german federal state", default="BY")
     argparse.add_argument("--year",   type=int,                 help="filter for specific year", default=datetime.now().year)
     argparse.add_argument("--notice", type=int,                 help="show the notice at an index")
                                                                 
