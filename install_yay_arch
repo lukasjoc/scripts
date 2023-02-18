@@ -1,6 +1,0 @@
-#!/bin/bash
-
-pacman -S binutils make gcc pkg-config fakeroot
-git clone https://aur.archlinux.org/yay.git /tmp/yay
-cd /tmp/yay || return 1
-makepkg -si
