@@ -59,18 +59,24 @@ def main(args) -> int:
     table_rows = []
     current  = datetime.now().date()
     next_found = False
-    for [notice, name, date] in rows:
-        formatted = date.strftime("%d.%m.%Y")
-        if date < current:
-            formatted = termcolor.colored(formatted, "white", attrs=["dark"])
-        elif date > current and not next_found and date.year == current.year:
-            next_found = True
-            formatted = termcolor.colored(formatted, "white", attrs=["bold"])
 
-        mark = termcolor.colored("!", "white", attrs=["bold"])
-        emty = termcolor.colored("-", "white", attrs=["dark"])
+    mark = termcolor.colored("!", "white", attrs=["bold"])
+    emty = termcolor.colored("-", "white", attrs=["dark"])
+
+    for [notice, name, date] in rows:
+        attrs = None
+        if date < current:
+            attrs = ["dark"]
+
+        if (date >= current
+            and not next_found
+            and date.year == current.year):
+            next_found = True
+            attrs = ["bold"]
+
         notice_formatted = f"[{mark}]" if notice != "-" else emty
-        table_rows.append([ notice_formatted, name, formatted])
+        date_formatted = termcolor.colored(date.strftime("%d.%m.%Y"), "white", attrs=attrs)
+        table_rows.append([ notice_formatted, name, date_formatted])
 
     table = tabulate(
         table_rows,
