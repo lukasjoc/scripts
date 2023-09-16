@@ -2,4 +2,3 @@
 
 # Disable Caps_Lock for better typing experience in vim and others...
 setxkbmap -option caps:none
-

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# indicates that the script ran and finished without any error 
+# indicates that the script ran and finished without any error
 EXIT_SUCCESS=0
 
 # indidattes the that the script ran into an error
@@ -12,7 +12,7 @@ _usage() {
     printf "\t%s\n" "[-dry-run-default,xdg] Dry-Run default or xdg"
     printf "\t%s\n" "[-default,-xdg] Run default or xfg"
     printf "\t%s\n" "[-h] Print this help message"
-    return 1;
+    return 1
 }
 
 # flag to indicate if `ANY` removing is done
@@ -22,69 +22,69 @@ _dryrun=0
 _default() {
     declare -a jj=(
 
-      # Swap junk
-      .swp
-      .swo
-      .swn
-      .swm
-      .swl
-      .swk
-      .swj
-      .swi
-      .swh
-      .swg
-      .swf
-      .swe
-      .swd
-      .swc
-      .swb
-      .swa
-      .svz
+        # Swap junk
+        .swp
+        .swo
+        .swn
+        .swm
+        .swl
+        .swk
+        .swj
+        .swi
+        .swh
+        .swg
+        .swf
+        .swe
+        .swd
+        .swc
+        .swb
+        .swa
+        .svz
 
-      # Weird .serverauth files and other junk
-      .serverauth.*
-      .mysql_history
-      .python_history
-      .mycli-history
-      .wget-hsts
-      .ctsystem
-      .CFUserTextEncoding
-      .DS_Store
-      .lesshst
-      .node_repl_history
-      .pnpm-debug.log
-      .sqlite_history
-      .bash_sessions
+        # Weird .serverauth files and other junk
+        .serverauth.*
+        .mysql_history
+        .python_history
+        .mycli-history
+        .wget-hsts
+        .ctsystem
+        .CFUserTextEncoding
+        .DS_Store
+        .lesshst
+        .node_repl_history
+        .pnpm-debug.log
+        .sqlite_history
+        .bash_sessions
 
-      # TODO: find more junk ??
-  )
+        # TODO: find more junk ??
+    )
 
-  for x in "${jj[@]}"; do
-      # We process all the files or patterns
-      # right now a `pattern` is identified by looking
-      # up the asteriks char `*` in the text coming in
-      if [[ -f "$x" ]]; then
-          echo "SUCC: junk identified : $x"
-          if [[ "$_dryrun" == 0 ]]; then
-              # we try to remove the candidate
-              # and message back to the user that
-              # it went through without complications
-              if rm -rf "$x"; then
-                  echo "SUCC: junk removed : $x"
-              else
-                  # we encountered some error while deleting
-                  # probably something that is not a `does_exist` error
-                  printf "%s\n" "HARD FAIL: junk could not be removed : $x"
-                  printf "%s\n" "This is some other weird error. Please investigate"
-              fi
-          fi
-      else
-          # if we dont find the candidate then
-          # we just print the BAIL text and continue processing
-          echo "BAIL: could not find : $x"
-      fi
-  done
-  return "$EXIT_FAILURE"
+    for x in "${jj[@]}"; do
+        # We process all the files or patterns
+        # right now a `pattern` is identified by looking
+        # up the asteriks char `*` in the text coming in
+        if [[ -f "$x" ]]; then
+            echo "SUCC: junk identified : $x"
+            if [[ "$_dryrun" == 0 ]]; then
+                # we try to remove the candidate
+                # and message back to the user that
+                # it went through without complications
+                if rm -rf "$x"; then
+                    echo "SUCC: junk removed : $x"
+                else
+                    # we encountered some error while deleting
+                    # probably something that is not a `does_exist` error
+                    printf "%s\n" "HARD FAIL: junk could not be removed : $x"
+                    printf "%s\n" "This is some other weird error. Please investigate"
+                fi
+            fi
+        else
+            # if we dont find the candidate then
+            # we just print the BAIL text and continue processing
+            echo "BAIL: could not find : $x"
+        fi
+    done
+    return "$EXIT_FAILURE"
 }
 
 _xdg() {
@@ -108,19 +108,38 @@ fi
 # we do nothing and print the help text
 # user, please tell us what to do
 if [[ "$#" == 0 ]]; then
-    _usage;
+    _usage
     exit "$EXIT_FAILURE"
 fi
 
 while [[ "$#" != 0 ]]; do
     case "$1" in
-        -dry-run-default) _dryrun=1; _default; exit "$EXIT_SUCCESS";;
-        -dry-run-xdg) _dryrun=1; _xdg; exit "$EXIT_SUCCESS";;
-        -default) _default; exit "$EXIT_SUCCESS";;
-        -xdg) _xdg; exit "$EXIT_SUCCESS";;
-        -h) _usage; exit "$EXIT_FAILURE";;
-        *) _usage; exit "$EXIT_FAILURE";;
+    -dry-run-default)
+        _dryrun=1
+        _default
+        exit "$EXIT_SUCCESS"
+        ;;
+    -dry-run-xdg)
+        _dryrun=1
+        _xdg
+        exit "$EXIT_SUCCESS"
+        ;;
+    -default)
+        _default
+        exit "$EXIT_SUCCESS"
+        ;;
+    -xdg)
+        _xdg
+        exit "$EXIT_SUCCESS"
+        ;;
+    -h)
+        _usage
+        exit "$EXIT_FAILURE"
+        ;;
+    *)
+        _usage
+        exit "$EXIT_FAILURE"
+        ;;
     esac
     shift
 done
-

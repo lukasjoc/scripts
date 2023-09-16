@@ -1,5 +1,5 @@
 #!/bin/bash
 
-hash xdg-open 2>/dev/null && exec xdg-open "$@" \
-    || hash open 2>/dev/null && exec open "$@" \
-    || exit 1
+hash xdg-open 2>/dev/null && exec xdg-open "$@" ||
+    hash open 2>/dev/null && exec open "$@" ||
+    exit 1

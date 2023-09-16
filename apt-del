@@ -4,7 +4,10 @@ set -eu
 
 trap ctrl_c_sig INT
 
-ctrl_c_sig() { echo "** Trapped (Running Clear Actions) CTRL-C"; clear; }
+ctrl_c_sig() {
+    echo "** Trapped (Running Clear Actions) CTRL-C"
+    clear
+}
 
 i=1
 declare -a options
@@ -28,11 +31,10 @@ choices=$(dialog --stdout --clear \
 clear
 
 for choice in ${choices[@]}; do
-    purge_program=${raw_options[(($choice-1))]}
+    purge_program=${raw_options[(($choice - 1))]}
     echo "Purgeing: $purge_program"
     yes | sudo apt-get purge "$purge_program"
     echo "Cleaning"
     yes | sudo apt autoremove
     yes | sudo apt autoclean
 done
-

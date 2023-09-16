@@ -9,9 +9,8 @@ echo "-------------DOCTOR------------"
 brew doctor
 echo "-------------------------"
 
-echo "Cleaning...";
+echo "Cleaning..."
 
 brew autoremove && brew cleanup
 
 echo "All done!"
-
