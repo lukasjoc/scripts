@@ -58,8 +58,7 @@ func NewClient(httpClient *http.Client) *Client {
 // the Client. Relative URLs should always be specified without a
 // preceding slash. If specified, the value pointed to by data is Query
 // encoded and included as the request body in order to perform form requests.
-func (c *Client) NewRequest(method, urlStr string,
-	data url.Values) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlStr string, data url.Values) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err

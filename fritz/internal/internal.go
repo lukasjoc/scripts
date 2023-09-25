@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -51,79 +52,66 @@ func (f *Fritz) Connect() error {
 	if err := f.Client.Auth(f.config.Username, f.config.Password); err != nil {
 		return err
 	}
-	defer f.Client.session.Close()
-	fmt.Printf("Connected to FRITZ!Box: %v \n", f.Client.session.Sid)
-
-    // "DeviceInfo1", "GetInfo"
-    // session := f.Client.session
-    // req, err := f.Client.NewRequest("POST", "/?lp=reboot", nil)
-    // if err != nil {
-    // }
 	return nil
 }
 
-func (f *Fritz) Reconnect() error {
-    // TODO: think i need a soap client for this shit
-    // service, action
-    // self.call_action("WANIPConn1", "ForceTermination")
-    return fmt.Errorf("TODO: fritz reconnect")
-}
-func (f *Fritz) Reboot() error    {
-     // self.call_action("DeviceConfig1", "Reboot")
-    return fmt.Errorf("TODO: fritz reboot")
+type FritzInfo struct {
+	Data any `json:"data"`
 }
 
-// func (a *Fritz) reboot() {
-// 	fmt.Println("=== Rebooting Router ===")
-//
-// 	err := a.connect()
-// 	if err != nil {
-// 		log.Fatalf("Error connecting to FRITZ!Box: %v", err)
-// 	}
-//
-// 	fmt.Printf("Model:   %s\n", a.Client.ModelName())
-// 	fmt.Printf("Host:    %s\n", a.Client.Host())
-//
-// 	fmt.Println("Rebooting router...")
-// 	err = a.Client.Reboot()
-// 	if err != nil {
-// 		log.Fatalf("Error rebooting router: %v", err)
-// 	}
-//
-// 	fmt.Println("Reboot command sent successfully.")
-// 	fmt.Println("Please wait for the router to restart.")
-// }
-//
-// func (a *Fritz) reconnect() {
-// 	fmt.Println("=== Reconnecting to ISP ===")
-//
-// 	err := a.connect()
-// 	if err != nil {
-// 		log.Fatalf("Error connecting to FRITZ!Box: %v", err)
-// 	}
-//
-// 	fmt.Printf("Current Public IP: %s\n", currentIP())
-//
-// 	fmt.Println("Reconnecting...")
-// 	err = a.Client.Reconnect()
-// 	if err != nil {
-// 		log.Fatalf("Error reconnecting: %v", err)
-// 	}
-//
-// 	fmt.Printf("Reconnection completed. New Public IP: %s\n", currentIP())
-// }
-//
-// func currentIP() string {
-// 	res, err := http.Get("https://httpbin.org/ip")
-// 	if err != nil {
-// 		log.Fatalf("Error getting current IP: %v", err)
-// 	}
-// 	defer res.Body.Close()
-//
-// 	body, err := ioutil.ReadAll(res.Body)
-// 	if err != nil {
-// 		log.Fatalf("Error reading response body: %v", err)
-// 	}
-//
-// 	return string(body)
-// }
+func (f *Fritz) Info() error {
+	if err := f.Connect(); err != nil {
+		return err
+	}
+	defer f.Client.session.Close()
+	req, _ := f.Client.NewRequest("POST", "data.lua", url.Values{
+		"xhr":         {"1"},
+		"sid":         {f.Client.session.Sid},
+		"lang":        {"de"},
+		"page":        {"overview"},
+		"xhrId":       {"all"},
+		"useajax":     {"1"},
+		"no_sidrenew": {""},
+	})
+	info := FritzInfo{}
+	fmt.Println("Getting info...")
+	_, err := f.Client.Do(req, &info)
+	if err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(info.Data, " ", "  ")
+	if err != nil {
+		return nil
+	}
+	fmt.Println(string(data))
+	return nil
+}
+func (f *Fritz) Reconnect() error {
+	if err := f.Connect(); err != nil {
+		return err
+	}
+	defer f.Client.session.Close()
+
+	req, _ := f.Client.NewRequest(
+		"GET",
+		"internet/inetstat_monitor.lua?myXhr=1&action=disconnect&useajax=1&xhr=1&t1695669022799=nocache",
+		url.Values{})
+	req1, _ := f.Client.NewRequest(
+		"GET",
+		"internet/inetstat_monitor.lua?myXhr=1&action=connect&useajax=1&xhr=1&t1695669022799=nocache",
+		url.Values{})
+
+	fmt.Println("Disconnecting...")
+	if _, err := f.Client.Do(req, nil); err != nil {
+		return err
+	}
+
+	fmt.Println("Connecting...")
+	if _, err := f.Client.Do(req1, nil); err != nil {
+		return err
+	}
+	fmt.Println("OK. This can take up to 30s to take full effect..")
+	return nil
+}
+
+func (f *Fritz) Reboot() error { return nil }

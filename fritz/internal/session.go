@@ -64,7 +64,7 @@ func NewSession(c *Client) *Session {
 
 // Open retrieves the challenge from FRITZ!Box.
 func (s *Session) Open() error {
-	req, err := s.client.NewRequest("GET", "login_sid.lua?version=2", nil)
+	req, err := s.client.NewRequest("GET", "login_sid.lua", nil)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (s *Session) Auth(username, password string) error {
 		return err
 	}
 
-	req, err := s.client.NewRequest("POST", "login_sid.lua?version=2", url.Values{
+	req, err := s.client.NewRequest("POST", "login_sid.lua", url.Values{
 		"username": {username},
 		"response": {cr},
 	})
