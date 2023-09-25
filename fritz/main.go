@@ -9,7 +9,7 @@ import (
 func printHelp() {
     fmt.Fprintf(os.Stderr, "\n%s [command]\n", os.Args[0])
     fmt.Fprintf(os.Stderr, "%-10s %s\n", "info", "Print info about the box and its configuration")
-    fmt.Fprintf(os.Stderr, "%-10s %s\n", "reconnect", "Quickly Disconnect and Reconnect again")
+    fmt.Fprintf(os.Stderr, "%-10s %s\n", "reconnect", "Quickly disconnect and reconnect again")
     fmt.Fprintf(os.Stderr, "%-10s %s\n", "reboot", "Quickly reboot the box")
 	os.Exit(1)
 }

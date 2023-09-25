@@ -114,4 +114,37 @@ func (f *Fritz) Reconnect() error {
 	return nil
 }
 
-func (f *Fritz) Reboot() error { return nil }
+func (f *Fritz) Reboot() error {
+	if err := f.Connect(); err != nil {
+		return err
+	}
+	defer f.Client.session.Close()
+	req, _ := f.Client.NewRequest(
+		"POST",
+		"data.lua",
+		url.Values{
+			"sid":    {f.Client.session.Sid},
+			"xhr":    {"1"},
+			"page":   {"reboot"},
+			"reboot": {"0"},
+		})
+	if _, err := f.Client.Do(req, nil); err != nil {
+		return err
+	}
+	req1, _ := f.Client.NewRequest(
+		"POST",
+		"reboot.lua",
+		url.Values{
+			"ajax":        {"1"},
+			"sid":         {f.Client.session.Sid},
+			"no_sidrenew": {"1"},
+			"xhr":         {"1"},
+			"useajax":     {"1"},
+		})
+	_, err := f.Client.Do(req1, nil);
+	if err != nil {
+		return err
+	}
+    fmt.Println("Rebooting... This can take a while. (5-8 minutes)")
+	return nil
+}
