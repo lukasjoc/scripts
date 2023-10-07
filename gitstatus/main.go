@@ -33,7 +33,7 @@ func (ansi AnsiText) String() string {
 
 // FIXME: go-git issue https://github.com/go-git/go-git/issues/74
 func revParseShowToplevel() (string, error) {
-	out, err := exec.Command("bash", "-c", "git rev-parse --show-toplevel").Output()
+	out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
 	if err != nil {
 		return "", nil
 	}
