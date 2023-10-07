@@ -11,24 +11,24 @@ import (
 )
 
 const (
-	AnsiColorBlack   = "\033[30m"
-	AnsiColorRed     = "\033[31m"
-	AnsiColorGreen   = "\033[32m"
-	AnsiColorYellow  = "\033[33m"
-	AnsiColorBlue    = "\033[34m"
-	AnsiColorMagenta = "\033[35m"
-	AnsiColorCyan    = "\033[36m"
-	AnsiColorWhite   = "\033[37m"
-	AnsiReset        = "\033[0m"
+	ansiColorBlack   = "\033[30m"
+	ansiColorRed     = "\033[31m"
+	ansiColorGreen   = "\033[32m"
+	ansiColorYellow  = "\033[33m"
+	ansiColorBlue    = "\033[34m"
+	ansiColorMagenta = "\033[35m"
+	ansiColorCyan    = "\033[36m"
+	ansiColorWhite   = "\033[37m"
+	ansiReset        = "\033[0m"
 )
 
-type AnsiText struct {
+type ansiText struct {
 	Color string
 	Text  string
 }
 
-func (ansi AnsiText) String() string {
-	return fmt.Sprintf("%s%s%s", ansi.Color, ansi.Text, AnsiReset)
+func (ansi ansiText) String() string {
+	return fmt.Sprintf("%s%s%s", ansi.Color, ansi.Text, ansiReset)
 }
 
 // FIXME: go-git issue https://github.com/go-git/go-git/issues/74
@@ -42,9 +42,9 @@ func revParseShowToplevel() (string, error) {
 
 func main() {
 	type GitStatus struct {
-		Branch   AnsiText
-		HeadHash AnsiText
-		Flags    []AnsiText
+		Branch   ansiText
+		HeadHash ansiText
+		Flags    []ansiText
 	}
 	tmpl, err := template.New("gitstatus").Parse("({{.Branch}}@{{.HeadHash}}{{if gt (len .Flags) 0}};{{range .Flags}}{{.}}{{end}}{{end}})\n")
 	if err != nil {
@@ -59,9 +59,8 @@ func main() {
 	if err != nil {
 		if err == git.ErrRepositoryNotExists {
 			os.Exit(0)
-		} else {
-			panic(err)
 		}
+		panic(err)
 	}
 
 	worktree, _ := repo.Worktree()
@@ -70,28 +69,23 @@ func main() {
 		panic(err)
 	}
 
-	flags := map[git.StatusCode]AnsiText{}
+	flags := map[git.StatusCode]ansiText{}
 	// TODO: flag for if behind remote and how many commits
 	for _, stat := range status {
 		switch stat.Worktree {
 		case git.Untracked:
-			flags[git.Untracked] = AnsiText{AnsiColorBlue, "+"}
-			break
+			flags[git.Untracked] = ansiText{ansiColorBlue, "+"}
 		case git.Modified:
-			flags[git.Modified] = AnsiText{AnsiColorYellow, "*"}
-			break
+			flags[git.Modified] = ansiText{ansiColorYellow, "*"}
 		case git.Added:
-			flags[git.Added] = AnsiText{AnsiColorCyan, "+"}
-			break
+			flags[git.Added] = ansiText{ansiColorCyan, "+"}
 		case git.Deleted:
-			flags[git.Deleted] = AnsiText{AnsiColorGreen, "-"}
-			break
+			flags[git.Deleted] = ansiText{ansiColorGreen, "-"}
 		case git.Renamed:
-			flags[git.Renamed] = AnsiText{AnsiColorYellow, "r"}
-			break
+			flags[git.Renamed] = ansiText{ansiColorYellow, "r"}
 		}
 	}
-	flagsFormatted := []AnsiText{}
+	flagsFormatted := []ansiText{}
 	for _, flag := range flags {
 		flagsFormatted = append(flagsFormatted, flag)
 	}
@@ -102,8 +96,8 @@ func main() {
 	}
 
 	formatted := GitStatus{
-		AnsiText{AnsiColorYellow, head.Name().Short()},
-		AnsiText{AnsiColorGreen, head.Hash().String()[0:8]},
+		ansiText{ansiColorYellow, head.Name().Short()},
+		ansiText{ansiColorGreen, head.Hash().String()[0:8]},
 		flagsFormatted,
 	}
 	if err := tmpl.Execute(os.Stdout, formatted); err != nil {
