@@ -1,3 +1,4 @@
 #!/bin/bash
 
-exec "$SHELL" -l
+# NOTE: Keep $SHELL unquoted to avoid creating nested shells
+exec $SHELL -l
