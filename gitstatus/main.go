@@ -84,18 +84,16 @@ func main() {
 	flags := []ansiText{}
 	// TODO: flag for if behind remote and how many commits
 	for _, stat := range statuses {
-		ansiStat := ansiText{ansiColorWhite, ""}
 		switch stat {
 		case StatusCodeUntracked:
-			ansiStat = ansiText{ansiColorYellow, "+"}
+			flags = append(flags, ansiText{ansiColorYellow, "+"})
 		case StatusCodeModified:
-			ansiStat = ansiText{ansiColorCyan, "*"}
+			flags = append(flags, ansiText{ansiColorCyan, "*"})
 		case StatusCodeDeleted:
-			ansiStat = ansiText{ansiColorRed, "-"}
+			flags = append(flags, ansiText{ansiColorRed, "-"})
 		case StatusCodeRenamed:
-			ansiStat = ansiText{ansiColorRed, "r"}
+			flags = append(flags, ansiText{ansiColorRed, "r"})
 		}
-		flags = append(flags, ansiStat)
 	}
 
 	// TODO: should replace this with git command to
@@ -107,5 +105,7 @@ func main() {
 	fmt.Print(ansiText{ansiColorYellow, head.Name().Short()})
 	fmt.Print("::")
 	fmt.Print(ansiText{ansiColorGreen, head.Hash().String()[0:8]})
-	fmt.Print(flags)
+	if len(flags) > 0 {
+		fmt.Print(flags)
+	}
 }
