@@ -58,19 +58,19 @@ func status() (string, error) {
 func main() {
 	path, err := revParseShowToplevel()
 	if err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		if err == git.ErrRepositoryNotExists {
 			os.Exit(0)
 		}
-		panic(err)
+		os.Exit(1)
 	}
 
 	status, err := status()
 	if err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 	statuses := []string{}
 	for _, line := range strings.Split(status, "\n") {
@@ -99,7 +99,7 @@ func main() {
 	// TODO: should replace this with git command to
 	head, err := repo.Head()
 	if err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 
 	fmt.Print(ansiText{ansiColorYellow, head.Name().Short()})

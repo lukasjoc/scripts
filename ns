@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# NOTE: Keep $SHELL unquoted to avoid creating nested shells
-exec $SHELL -l
