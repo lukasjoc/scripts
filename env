@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# source all available custom completions
+for f in $HOME/.local/scripts/completion/*; do source $f ; done
