@@ -1,0 +1,4 @@
+#!/bin/sh
+
+git for-each-ref --sort=-committerdate --format='%1B[32m%(committerdate:iso8601) LOCAL %1B[34m%(committerdate:relative) %1B[0;m%(refname:short)' refs/heads
+git for-each-ref --sort=-committerdate --format='%1B[32m%(committerdate:iso8601) REMOT %1B[34m%(committerdate:relative) %1B[0;m%(refname:short)' refs/remotes

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat

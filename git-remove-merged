@@ -1,0 +1,4 @@
+#!/bin/sh
+
+git fetch --all --prune --prune-tags --progress
+for br in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do git branch -D "$br"; done
