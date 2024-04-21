@@ -1,0 +1,7 @@
+#!/bin/sh
+
+b=$(git rev-parse --abbrev-ref HEAD)
+flags=$(git status --short -M | cut -c-2 | uniq | xargs | sed 's/\s//g')
+
+printf "%s[%s]\n" "$b" "$flags"
+
