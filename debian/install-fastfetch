@@ -1,0 +1,16 @@
+#!/bin/bash
+set -ex
+
+sudo apt update; sudo apt install --yes -vv clang pkg-config
+clone_dir=/tmp/fastfetch
+build_dir=/tmp/fastfetch/build
+rm -rf "$clone_dir"
+git clone git@github.com:fastfetch-cli/fastfetch.git "$clone_dir"
+mkdir -p "$build_dir"
+cd "$build_dir"
+cmake ..
+cmake --build . --target fastfetch --target flashfetch
+cp $build_dir/fastfetch $HOME/.local/bin/neofetch
+cp $build_dir/fastfetch $HOME/.local/bin/fastfetch
+rm -rf "$clone_dir"
+
