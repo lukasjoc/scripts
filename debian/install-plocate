@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -ex
+
+sudo apt install plocate
+sudo updatedb
+sudo systemctl enable plocate-updatedb.timer
+sudo systemctl start plocate-updatedb.timer
+sudo systemctl status plocate-updatedb.timer
