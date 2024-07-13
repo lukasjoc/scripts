@@ -8,6 +8,15 @@ rm -rf "$clone_dir"
 git clone git@github.com:fastfetch-cli/fastfetch.git "$clone_dir"
 mkdir -p "$build_dir"
 cd "$build_dir"
+
+# https://github.com/fastfetch-cli/fastfetch/blob/dev/debian/control#L5C16-L5C336
+sudo apt install libvulkan-dev libwayland-dev libxrandr-dev libxcb-randr0-dev   \
+libdconf-dev libdbus-1-dev libmagickcore-dev libxfconf-0-dev libsqlite3-dev     \
+librpm-dev libegl-dev libglx-dev libosmesa6-dev ocl-icd-opencl-dev libnm-dev    \
+libpulse-dev libdrm-dev libddcutil-dev libchafa-dev directx-headers-dev pkgconf \
+cmake debhelper dh-cmake dh-cmake-compat dh-sequence-cmake dh-sequence-ctest    \
+ninja-build
+
 cmake ..
 cmake --build . --target fastfetch --target flashfetch
 cp $build_dir/fastfetch $HOME/.local/bin/neofetch
