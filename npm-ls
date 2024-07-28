@@ -1,6 +1,0 @@
-#!/bin/sh
-
-echo "Node: $(type node)"
-echo "Npm: $(type npm)"
-echo
-npm list -g --depth=0
