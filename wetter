@@ -1,5 +1,3 @@
-#!/bin/bash
-
-set -ex
+#!/bin/sh
 
 curl https://wttr.in/munich?format=4
