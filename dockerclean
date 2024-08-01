@@ -2,8 +2,8 @@
 
 set -ex
 
-docker container stop $(docker container ls -qa)
-docker rm $(docker container ls -qa)
-docker rmi $(docker images -q)
-docker network prune -f
-docker volume  prune -f
+docker container stop $(docker container ls -qa) || true
+docker rm $(docker container ls -qa) || true
+docker rmi $(docker images -q) || true
+docker network prune -f || true
+docker volume  prune -f || true
