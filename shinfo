@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+ansi_imp="\e[1;31m"
+ansi_bold="\e[1m"
+ansi_clear="\e[0m"
+
+figlet -f small "shinfo"
+
+printf "$ansi_bold%s$ansi_clear\t%s\n" "Shell is     "    "$SHELL"
+printf "$ansi_bold%s$ansi_clear\t%s\n" "Nesting      "     "$SHLVL"
+
+istmux=$([[ -n $TMUX ]] && echo "Yes" || echo "No")
+printf "$ansi_bold%s$ansi_clear\t%s\n" "TMUX active? " "$istmux"
+
+printf "%s\t%s\n" "Term is	    " "$TERM $COLORTERM"
+printf "%s\t%s\n" "Current Path is" "$PWD"
+
+printf "\n%s\n" "OS & Session"
+release=$($(echo cat /etc/os-release) | head -n1 | sed "s/.*=//g" | sed "s/\"//g")
+endianess=$(lscpu -J | jq -r "map(.[3].data)[0]")
+printf "%s\t%s\n" "Release is" "$release"
+printf "%s\t%s\n" "Uptime is" "$(uptime -p)"
+printf "%s\t%s\n" "Endianess is" "$endianess"
+printf "%s\t%s\n" "x11 or Wayland?"     "$XDG_SESSION_TYPE ($XDG_CURRENT_DESKTOP)"
+
