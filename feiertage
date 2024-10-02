@@ -1,108 +1,134 @@
 #!/usr/bin/env python3
 
 """
-Sadly, back then, I decided to write this in python. So now I have to deal with
-python packacking. So here you go. This is what is reQuiRed.
-1. python@3.10.9 or higher
-1. pip -v install tabulate requests platformdirs termcolor argparse
-
-Now dont make the same mistake, and write ur stuff in go.
+A simple, *self contained* python3 script to list the german "feiertage" in a
+more readable format. This uses the feiertage-api API (https://feiertage-api.de/).
 """
 import argparse
-from argparse import ArgumentTypeError
-import termcolor
-from datetime import datetime
 import json
+import os
 import sys
+from argparse import ArgumentTypeError
+from collections import namedtuple
+from datetime import datetime
+from pathlib import Path
 
-import platformdirs
-import requests
-from tabulate import tabulate
+AnsiColor = namedtuple("AnsiColor", ["fg"])
+AnsiMode  = namedtuple("AnsiMode", ["set"])
 
+ANSI_COLOR_DEFAULT  = AnsiColor(fg="")
+ANSI_WHITE          = AnsiColor(fg="\033[37m")
+ANSI_RED            = AnsiColor(fg="\033[31m")
+ANSI_GREEN          = AnsiColor(fg="\033[32m")
+ANSI_MODE_DEFAULT   = AnsiMode(set="")
+ANSI_MODE_DIMM      = AnsiMode(set="\033[2m")
+ANSI_MODE_BOLD      = AnsiMode(set="\033[1m")
+ANSI_MODE_UNDERLINE = AnsiMode(set="\033[4m")
+
+ANSI_RESET_ALL = "\033[0m"
+def termcolor(text: str, color: AnsiColor = ANSI_COLOR_DEFAULT,
+              mode: AnsiMode = ANSI_MODE_DEFAULT) -> str:
+    return f"{mode.set}{color.fg}{text}{ANSI_RESET_ALL}"
+
+EXIT_OK      = 0
+EXIT_ERR     = 1
+EXIT_NOPOSIX = 2
+EXIT_NONOT   = 3
+
+MARK = termcolor("!", color=ANSI_WHITE, mode=ANSI_MODE_BOLD)
+TABLE_HEADER = ["Datum", "Feiertag", "Hinweis"]
+TableRow = namedtuple("TableRow", ["date", "name", "notice"])
+
+import http
+import http.client
+from http.client import HTTPException
+
+class FeiertageApi:
+    BASE_URL = "feiertage-api.de"
+    conn: http.client.HTTPConnection | None = None
+    def get(self, year: int , state: str):
+        if not year or not state: return None
+        cachepath = Path(os.path.expanduser("~")).joinpath(".cache/feiertage")
+        if not cachepath.exists():
+            cachepath.mkdir(parents=True, exist_ok=True)
+        cachefile = cachepath.joinpath(f"{year}-{state}.json")
+        if cachefile.exists():
+            print(f"{termcolor('INFO', color=ANSI_GREEN)}: Reading from cache {cachefile}", end="\n\n")
+            with cachefile.open("r+") as f:
+                return json.load(f)
+        print(f"{termcolor('INFO', color=ANSI_GREEN)}: Fetching from feiertage-api.de year={year}, state={state}", end="\n\n")
+        self.conn.request("GET", f"/api/?jahr={year}&nur_land={state}", headers={"Content-Type": "application/json"})
+        res = self.conn.getresponse()
+        if res.status != http.HTTPStatus.OK:
+            raise HTTPException(f"something went wrong with fetch the data: HTTP/{req.status_code}")
+        data = json.loads(res.read().decode("utf-8").replace("'", '"'))
+        with cachefile.open("w+") as f: json.dump(data, f, indent=2)
+        return data
+    def __enter__(self):
+        self.conn = http.client.HTTPConnection(self.BASE_URL) if not self.conn else self.conn
+        return self
+    def __exit__(self, _, __, ___):
+        if not self.conn: return
+        self.conn.close()
+        self.conn = None
 
 def main(args) -> int:
-    cachepath = platformdirs.user_cache_path(appname="feiertage")
-    if not cachepath.exists(): cachepath.mkdir()
-
-    cachefile = cachepath.joinpath(f"{args.year}-{args.state}.json")
-    data = None
-    if not cachefile.exists():
-        print("[INFO]: Fetching from feiertage-api.de", end="\n\n")
-        api_url = f"https://feiertage-api.de/api/?jahr={args.year}&nur_land={args.state}"
-        req = requests.get(api_url)
-        req.encoding = "utf-8-sig"
-        if req.status_code != 200:
-            raise requests.HTTPError(f"something went wrong with fetch the data: HTTP/{req.status_code}")
-
-        data = req.json()
-        with cachefile.open("w+") as f:
-            json.dump(data, f, indent=2)
-
-    if not data:
-        print(f"[INFO]: Reading from cache {cachefile}", end="\n\n")
-        with cachefile.open("r+") as f:
-            data = json.load(f)
-
+    if os.name != "posix": return EXIT_NOPOSIX
+    with FeiertageApi() as api:
+        try:
+            data = api.get(year=args.year, state=args.state)
+        except HTTPException as e:
+            print(f"{termcolor('[ERR]', color=ANSI_RED)}: {e}", end="\n")
+            return EXIT_ERR
 
     # Rendering the table and handling other options
-    rows = []
+    rows: List[TableRow] = []
     for name, info in data.items():
-        date = datetime.strptime(info.get("datum"), "%Y-%m-%d").date()
-        notice = info.get("hinweis")
-        rows.append([notice if notice else "-", name, date])
+        from dateutil.parser import parse
+        rows.append(TableRow(date=parse(info.get("datum")), name=name, notice=info.get("hinweis") or None))
 
+    # Notice display for a single notice id
     if args.notice:
-        if args.notice > len(rows): return 1
-        an = args.notice
-        if an == len(rows): an = len(rows)-1
-        print(rows[an][0])
-        return 0
+        if args.notice < 0 or args.notice >= len(rows):
+            return EXIT_NONOT
+        row = rows[args.notice]
+        if not row.notice:
+            return EXIT_NONOT
+        print(row.notice)
+        return EXIT_OK
 
-    table_rows = []
-    current  = datetime.now().date()
+    # Default display of events
+    table_rows: List[TableRow] = []
+    now = datetime.now()
     next_found = False
-
-    mark = termcolor.colored("!", "white", attrs=["bold"])
-    emty = termcolor.colored("-", "white", attrs=["dark"])
-
-    for [notice, name, date] in rows:
-        attrs = None
-        if date < current:
-            attrs = ["dark"]
-
-        if (date >= current
-            and not next_found
-            and date.year == current.year):
+    max_indent = max(len(row.name) for row in rows)
+    for index, row in enumerate(rows):
+        mode = ANSI_MODE_DEFAULT
+        if row.date < now:
+            mode = ANSI_MODE_DIMM
+        if row.date >= now and not next_found and row.date.year == now.year:
             next_found = True
-            attrs = ["bold"]
-
-        notice_formatted = f"[{mark}]" if notice != "-" else emty
-        date_formatted = termcolor.colored(date.strftime("%d.%m.%Y"), "white", attrs=attrs)
-        table_rows.append([ notice_formatted, name, date_formatted])
-
-    table = tabulate(
-        table_rows,
-        headers=["Index", "Notice", "Name", "Date"],
-        showindex=True,
-        disable_numparse=True,
-        tablefmt="plain",
-    )
-
-    termcolor.cprint(table)
-    return 0
-
+            mode = ANSI_MODE_BOLD
+        notice_formatted = f"({MARK}|{index})" if row.notice else ""
+        date_formatted = termcolor(row.date.strftime("%d.%m.%Y"), color=ANSI_WHITE, mode=mode)
+        name_formatted = f"{row.name}{' ' * (max_indent-len(row.name))}"
+        print(" ".join([date_formatted, name_formatted, notice_formatted]))
+    return EXIT_OK
 
 if __name__ == "__main__":
-    def validate_state_code(state_code):
-        states = ["NATIONAL", "BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP",
-            "SL", "SN", "ST", "SH", "TH"]
-        if state_code not in states:
-            raise ArgumentTypeError(f"{state_code} is not a valid german state code")
-        return state_code
-
+    SUPPORTED_STATE_CODES = ["NATIONAL", "BW", "BY", "BE", "BB", "HB", "HH", "HE",
+                         "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
     argparse = argparse.ArgumentParser()
-    argparse.add_argument("--state",  type=validate_state_code, help="a two-letter code representing a german federal state", default="BY")
-    argparse.add_argument("--year",   type=int,                 help="filter for specific year", default=datetime.now().year)
-    argparse.add_argument("--notice", type=int,                 help="show the notice at an index")
+    argparse.add_argument("--state",  type=str, choices=SUPPORTED_STATE_CODES, help="a two-letter code representing a german federal state", default="BY")
+    argparse.add_argument("--year",   type=int, help="filter for specific year (might fetch from internet)", default=datetime.now().year)
+    argparse.add_argument("--notice", type=int, help="show the notice at an index")
     args = argparse.parse_args()
-    sys.exit(main(args))
+    code = main(args)
+    if code == EXIT_NOPOSIX:
+        print(f"{termcolor(f'EXIT_NOPOSIX', color=ANSI_RED)}: Only POSIX is supported. As it should be. ;)\n")
+        argparse.print_help()
+    elif code == EXIT_NONOT:
+        print(f"{termcolor(f'EXIT_NONOT', color=ANSI_RED)}: The notice id you provided doesnt exist or is invalid.\n")
+        argparse.print_help()
+    sys.exit(code)
+
