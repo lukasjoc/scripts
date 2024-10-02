@@ -84,8 +84,8 @@ def main(args) -> int:
     # Rendering the table and handling other options
     rows: List[TableRow] = []
     for name, info in data.items():
-        from dateutil.parser import parse
-        rows.append(TableRow(date=parse(info.get("datum")), name=name, notice=info.get("hinweis") or None))
+        date = datetime.strptime(info.get("datum"), "%Y-%m-%d").date()
+        rows.append(TableRow(date=date, name=name, notice=info.get("hinweis") or None))
 
     # Notice display for a single notice id
     if args.notice:
@@ -99,7 +99,7 @@ def main(args) -> int:
 
     # Default display of events
     table_rows: List[TableRow] = []
-    now = datetime.now()
+    now = datetime.now().date()
     next_found = False
     max_indent = max(len(row.name) for row in rows)
     for index, row in enumerate(rows):
