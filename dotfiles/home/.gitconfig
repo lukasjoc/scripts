@@ -1,0 +1,36 @@
+[init]
+    defaultBranch = main
+[core]
+    autocrlf = false
+    excludesfile = .gitignore
+    quotepath = false
+    editor = nvim
+[help]
+    autocorrect=1
+
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+    ui = true
+    pager = true
+
+[alias]
+    br = branch -vv
+    ch = checkout
+    st = status
+    diff = diff --patience
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
+[pull]
+    rebase = true
+
+[user]
+    name = lukasjoc
+    email = 45790416+lukasjoc@users.noreply.github.com
