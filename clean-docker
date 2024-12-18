@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -ex
-
-docker container stop $(docker container ls -qa) || true
-docker rm $(docker container ls -qa) || true
-docker rmi $(docker images -q) || true
-docker network prune -f || true
-docker volume  prune -f || true
