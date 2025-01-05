@@ -45,7 +45,7 @@ from http.client import HTTPException
 
 class FeiertageApi:
     BASE_URL = "feiertage-api.de"
-    conn: http.client.HTTPConnection | None = None
+    conn: http.client.HTTPConnection = None
     def get(self, year: int , state: str):
         if not year or not state: return None
         cachepath = Path(os.path.expanduser("~")).joinpath(".cache/feiertage")
