@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -ex
+
+GOVERS="1.24.0"
+
+if [[ -d "$HOME/.local/go" ]]; then
+    mv "$HOME/.local/go" "$HOME/.local/go.back"
+fi
+
+wget "https://go.dev/dl/go$GOVERS.linux-amd64.tar.gz"
+tar -C "$HOME/.local" -xzf go$GOVERS.linux-amd64.tar.gz
+rm -rf go*.tar*
+
+hash 2>&1 /dev/null
+echo
+go version
+go env
+
+go install "golang.org/x/tools/cmd/stringer@latest"
+go install "golang.org/x/vuln/cmd/govulncheck@latest"
+go install "honnef.co/go/tools/cmd/staticcheck@latest"
+
+if [[ -d $HOME/.local/go.back ]]; then
+    chmod -R 777 "$HOME/.local/go.back"
+    rm -rf "$HOME/.local/go.back"
+fi
