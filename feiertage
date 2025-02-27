@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 """
-Requirements:
-python@3.10.9 or higher
-pip -v install tabulate requests platformdirs termcolor argparse
-"""
+Sadly, back then, I decided to write this in python. So now I have to deal with
+python packacking. So here you go. This is what is reQuiRed.
+1. python@3.10.9 or higher
+1. pip -v install tabulate requests platformdirs termcolor argparse
 
+Now dont make the same mistake, and write ur stuff in go.
+"""
 import argparse
 from argparse import ArgumentTypeError
 import termcolor
@@ -80,15 +82,13 @@ def main(args) -> int:
 
     table = tabulate(
         table_rows,
-        headers=["Index", "Hinweis", "Name", "Datum"],
+        headers=["Index", "Notice", "Name", "Date"],
         showindex=True,
         disable_numparse=True,
         tablefmt="plain",
     )
 
     termcolor.cprint(table)
-    ###
-
     return 0
 
 
