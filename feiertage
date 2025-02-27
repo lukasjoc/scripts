@@ -28,6 +28,7 @@ def main(args) -> int:
         print("[INFO]: Fetching from feiertage-api.de", end="\n\n")
         api_url = f"https://feiertage-api.de/api/?jahr={args.year}&nur_land={args.state}"
         req = requests.get(api_url)
+        req.encoding = "utf-8-sig"
         if req.status_code != 200:
             raise requests.HTTPError(f"something went wrong with fetch the data: HTTP/{req.status_code}")
 
