@@ -1,6 +1,8 @@
 #!/bin/bash
 
-GOVERS="1.22.0"
+GOVERS="1.23.0"
+
+mv "$HOME/.local/go" "$HOME/.local/go.back"
 wget "https://go.dev/dl/go$GOVERS.linux-amd64.tar.gz"
 tar -C "$HOME/.local" -xzf go$GOVERS.linux-amd64.tar.gz
 rm -rf go*.tar*
@@ -8,3 +10,10 @@ hash 2>&1 /dev/null
 echo
 go version
 go env
+
+echo "Installing some tools..."
+go install "honnef.co/go/tools/cmd/staticcheck@latest"
+go get "golang.org/x/tools/cmd/stringer@latest"
+
+echo "Cleanup..."
+rm -rf "$HOME/.local/go.back"
