@@ -1,4 +1,0 @@
-#!/bin/bash
-
-[[ -f "$PWD/package.json" ]]
-jq .scripts "$PWD/package.json"
