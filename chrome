@@ -1,6 +1,0 @@
-#!/bin/bash
-
-/Applications/Chromium.app/Contents/MacOS/Chromium \
-    -psn_0_53261 \
-    --flag-switches-begin \
-    --flag-switches-end
