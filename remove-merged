@@ -1,0 +1,4 @@
+#!/bin/sh
+
+git fetch -p
+for br in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do git br -D "$br"; done

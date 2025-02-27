@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# push a local branch to the remote registry
+# this is a game changer in workflow integrity ;)
+# check if the the function received a branch name
+if [[ -z "$1" ]]; then
+    echo "Need branch to push or '.' for the current as a shortcut"
+    return 1
+fi
+
+# assign the given branch name to a variable
+# if the input was a dot '.' then get the current
+# checked out branch as the local_branch
+local local_branch
+local_branch="$1"
+if [[ "$1" == "." ]]; then
+    local_branch="$(git branch --show-current)"
+    echo "Using: $local_branch as the branch name"
+fi
+
+# if the branch already exists remotely, then do nothing
+# this is an error so exit with non zero exit code
+if git show-ref --quiet "refs/remotes/origin/$local_branch"; then
+    echo "Branch $local_branch already has a remote counterpart"
+    return 1
+fi
+
+# check if the branch_name exists locally as a branch object
+if git show-ref --quiet "refs/heads/$local_branch"; then
+    if git push --set-upstream origin "$local_branch"; then
+        echo "INFO: Branch $local_branch now available remotely"
+    fi
+else
+    echo "The branch $local_branch does not exist locally. Please create it :>)"
+    return 1
+fi
