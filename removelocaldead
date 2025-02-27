@@ -1,0 +1,15 @@
+#!/bin/bash
+# remove local branches that dont have remotes anymore because they
+# where merged with autodelete or deleted or somethin
+set -u
+
+git fetch -p
+for br in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do
+    read -p "Delete $br (yes|Yes/no|No)?" userisking
+    echo;
+    case "$userisking" in 
+        yes|Yes ) git branch -D "$br" ;;
+        no|No ) echo "Not deleting $br.. ";;
+        * ) echo "Only yes|Yes and no|No is allowed";;
+    esac
+done

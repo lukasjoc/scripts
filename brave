@@ -1,0 +1,16 @@
+#!/bin/bash
+
+/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser \
+    -psn_0_639132 \
+    --enable-dom-distiller \
+    --disable-domain-reliability \
+    --no-pings \
+    --extension-content-verification=enforce_strict \
+    --extensions-install-verification=enforce \
+    --origin-trial-public-key=bYUKPJoPnCxeNvu72j4EmPuK7tr1PAC7SHh8ld9Mw3E=,fMS4mpO6buLQ/QMd+zJmxzty/VQ6B1EUZqoCU04zoRU= \
+    --sync-url=https://sync-v2.brave.com/v2 \
+    --lso-url=https://no-thanks.invalid \
+    --enable-features=AutoupgradeMixedContent,LegacyTLSEnforced,WebUIDarkMode,PrefetchPrivacyChanges,PasswordImport,ReducedReferrerGranularity \
+    --disable-features=AutofillEnableAccountWalletStorage,SafeBrowsingEnhancedProtection,VideoPlaybackQuality,AllowPopupsDuringPageUnload,SmsReceiver,NotificationTriggers,TextFragmentAnchor,TabHoverCards,PrivacySettingsRedesign,IdleDetection,PasswordCheck,AutofillServerCommunication,SignedExchangeSubresourcePrefetch \
+    --flag-switches-begin \
+    --flag-switches-end

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+if ! command -v "brew" >/dev/null 2>&1;  then
+  echo "Brew not installed..."
+  echo "Run /usr/bin/ruby -e '$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)' to install it..."
+  echo "Happy brewing. :)"
+fi
+
+brew install python node nim go rust \
+    git ack bash fish tmux tree \
+    watch curl wget nmap \
+    figlet fortune htop iproute2mac \
+    colordiff
+
+brew install --cask alfred \
+    authy docker qbittorrent \
+    spectacle firefox \
+    virtualbox xquartz \
+    macvim alacritty
+
+brew doctor
+
+echo "DONE"

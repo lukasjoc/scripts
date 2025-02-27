@@ -1,0 +1,17 @@
+!#/bin/bash
+
+# First update
+sudo pacman -Syy
+
+# Install deps
+sudo pacman -S virt-manager qemu libvirt dmidecode ebtables
+
+# Add group to user
+su -
+usermod -aG libvirt MY_USER
+exit 
+
+# enable and start libvirtd 
+sudo systemctl --now enable libvirtd
+
+# DONE :)
