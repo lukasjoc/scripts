@@ -58,7 +58,6 @@ class CoolDockerParser:
             image: str          = config["Image"]
             names: str          = attrs["Name"][1:]
             created: str        = self.__timedelta(time=attrs["Created"])
-                                     
             ns: dict = attrs["NetworkSettings"]
             network_ports: Dict[Any, Any] = ns["Ports"].items()
             ports: str = ""
@@ -154,7 +153,6 @@ class CoolDockerParser:
             volume_name: str = attrs["Name"]
             driver: str      = attrs["Driver"]
             scope: str       = attrs["Scope"]
-                             
             data[volume_name] = volume_name, driver, scope
 
         count: int = len(data)
@@ -169,12 +167,10 @@ def main(args: argparse.Namespace) -> int:
         docker_client = docker.from_env()
         cooldocker = CoolDockerParser(client=docker_client)
         args.all = not any([args.c, args.i, args.n, args.v])
-                                                                                                  
         show_containers = cooldocker.fmt(want=args.all or args.c, entity=cooldocker.containers(), color="cyan")
         show_imgs       = cooldocker.fmt(want=args.all or args.i, entity=cooldocker.images(),     color="red")
         show_networks   = cooldocker.fmt(want=args.all or args.n, entity=cooldocker.networks(),   color="green")
         show_volumes    = cooldocker.fmt(want=args.all or args.v, entity=cooldocker.volumes(),    color="magenta")
-                                                                                                  
         show = [show_containers, show_imgs, show_networks, show_volumes]
         [print(ent) for ent in show if ent]
 
@@ -198,7 +194,6 @@ if __name__ == "__main__":
     parser.add_argument("-i",    type=autobool, nargs="?", const=True, default=False, help="include Images in the output")
     parser.add_argument("-n",    type=autobool, nargs="?", const=True, default=False, help="include networks in the output")
     parser.add_argument("-v",    type=autobool, nargs="?", const=True, default=False, help="include volumes in the output")
-                                                                                        
     args = parser.parse_args()
     sys.exit(main(args=args))
 
