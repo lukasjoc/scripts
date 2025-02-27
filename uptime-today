@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# TODO: combine rows
+
 mkdir -p "$HOME/.local/share/scripts/uptime-today"
 echo "$(date "+%x (%X)") | $(uptime -p)" >> "$HOME/.local/share/scripts/uptime-today/log"
 cat  "$HOME/.local/share/scripts/uptime-today/log"
+
+
