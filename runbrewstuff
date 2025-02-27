@@ -1,12 +1,17 @@
 #!/bin/bash
 
-set -ex
-
-brew upgrade --fetch-HEAD --greedy  --verbose
+set -eu
 
 rm -rf "$(brew --cache)"
-brew doctor
-brew autoremove
-brew cleanup
+brew upgrade --fetch-HEAD --greedy
 
-echo "Done ;)"
+echo "-------------DOCTOR------------"
+brew doctor
+echo "-------------------------"
+
+echo "Cleaning...";
+
+brew autoremove && brew cleanup
+
+echo "All done!"
+
