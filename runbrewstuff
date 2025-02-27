@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -ex
+
+brew upgrade --fetch-HEAD --greedy  --verbose
+
+rm -rf "$(brew --cache)"
+brew doctor
+brew autoremove
+brew cleanup
+
+echo "Done ;)"
