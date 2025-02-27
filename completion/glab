@@ -2,17 +2,15 @@
 #
 # bash completion V2 for glab                                 -*- shell-script -*-
 
-__glab_debug()
-{
+__glab_debug() {
     if [[ -n ${BASH_COMP_DEBUG_FILE:-} ]]; then
-        echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
+        echo "$*" >>"${BASH_COMP_DEBUG_FILE}"
     fi
 }
 
 # Macs have bash3 for which the bash-completion package doesn't include
 # _init_completion. This is a minimal version of that function.
-__glab_init_completion()
-{
+__glab_init_completion() {
     COMPREPLY=()
     _get_comp_words_by_ref "$@" cur prev words cword
 }
@@ -27,8 +25,8 @@ __glab_get_completion_results() {
     args=("${words[@]:1}")
     requestComp="${words[0]} __complete ${args[*]}"
 
-    lastParam=${words[$((${#words[@]}-1))]}
-    lastChar=${lastParam:$((${#lastParam}-1)):1}
+    lastParam=${words[$((${#words[@]} - 1))]}
+    lastChar=${lastParam:$((${#lastParam} - 1)):1}
     __glab_debug "lastParam ${lastParam}, lastChar ${lastChar}"
 
     if [ -z "${cur}" ] && [ "${lastChar}" != "=" ]; then
@@ -136,7 +134,7 @@ __glab_handle_standard_completion_case() {
         comp=${comp%%$tab*}
         # Only consider the completions that match
         comp=$(compgen -W "$comp" -- "$cur")
-        if ((${#comp}>longest)); then
+        if ((${#comp} > longest)); then
             longest=${#comp}
         fi
     done < <(printf "%s\n" "${out[@]}")
@@ -167,8 +165,7 @@ __glab_handle_standard_completion_case() {
     fi
 }
 
-__glab_handle_special_char()
-{
+__glab_handle_special_char() {
     local comp="$1"
     local char=$2
     if [[ "$comp" == *${char}* && "$COMP_WORDBREAKS" == *${char}* ]]; then
@@ -180,8 +177,7 @@ __glab_handle_special_char()
     fi
 }
 
-__glab_format_comp_descriptions()
-{
+__glab_format_comp_descriptions() {
     local tab
     tab=$(printf '\t')
     local comp="$1"
@@ -194,25 +190,25 @@ __glab_format_comp_descriptions()
 
         # $COLUMNS stores the current shell width.
         # Remove an extra 4 because we add 2 spaces and 2 parentheses.
-        maxdesclength=$(( COLUMNS - longest - 4 ))
+        maxdesclength=$((COLUMNS - longest - 4))
 
         # Make sure we can fit a description of at least 8 characters
         # if we are to align the descriptions.
         if [[ $maxdesclength -gt 8 ]]; then
             # Add the proper number of spaces to align the descriptions
-            for ((i = ${#comp} ; i < longest ; i++)); do
+            for ((i = ${#comp}; i < longest; i++)); do
                 comp+=" "
             done
         else
             # Don't pad the descriptions so we can fit more text after the completion
-            maxdesclength=$(( COLUMNS - ${#comp} - 4 ))
+            maxdesclength=$((COLUMNS - ${#comp} - 4))
         fi
 
         # If there is enough space for any description text,
         # truncate the descriptions that are too long for the shell width
         if [ $maxdesclength -gt 0 ]; then
             if [ ${#desc} -gt $maxdesclength ]; then
-                desc=${desc:0:$(( maxdesclength - 1 ))}
+                desc=${desc:0:$((maxdesclength - 1))}
                 desc+="…"
             fi
             comp+="  ($desc)"
@@ -223,8 +219,7 @@ __glab_format_comp_descriptions()
     printf "%q" "${comp}"
 }
 
-__start_glab()
-{
+__start_glab() {
     local cur prev words cword split
 
     COMPREPLY=()
