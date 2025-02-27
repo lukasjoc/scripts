@@ -11,7 +11,6 @@ from argparse import ArgumentTypeError
 import termcolor
 from datetime import datetime
 import json
-import os
 import sys
 
 import platformdirs
@@ -42,7 +41,7 @@ def main(args) -> int:
             data = json.load(f)
 
 
-    # Rendering the table and handle other options
+    # Rendering the table and handling other options
     rows = []
     for name, info in data.items():
         date = datetime.strptime(info.get("datum"), "%Y-%m-%d").date()
