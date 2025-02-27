@@ -5,7 +5,7 @@ import sys
 
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
-        print("Usage: python divisors.py <target>")
+        print("Usage: parts <target>")
         return 1
     target: int = int(argv[1])
     print(f"Equal Divisors of: {target}")
@@ -18,3 +18,4 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
+
