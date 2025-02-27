@@ -1,4 +1,4 @@
 #!/bin/sh
 
-git log --all --graph --oneline --source --cherry-mark
+git log --all --graph --oneline --source --cherry-mark \
 	--pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an (%G?)>%Creset'
