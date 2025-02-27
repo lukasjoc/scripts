@@ -1,0 +1,11 @@
+#!/bin/bash
+
+rm -rf $GOPATH; mkdir -p $GOPATH;
+GOVERS="1.21.6"
+wget "https://go.dev/dl/go$GOVERS.linux-amd64.tar.gz"
+tar -C "$HOME/.local" -xzf go$GOVERS.linux-amd64.tar.gz
+rm -rf go*.tar*
+hash 2>&1 /dev/null
+echo
+go version
+go env

@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cowthink $(uptime -p)
-
