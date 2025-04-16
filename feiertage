@@ -108,8 +108,13 @@ def main(args) -> int:
         if row.date >= now and not next_found and row.date.year == now.year:
             next_found = True
             mode = ANSI_MODE_BOLD
-        notice_formatted = f"({MARK}|{index})" if row.notice else ""
-        date_formatted = termcolor(row.date.strftime("%d.%m.%Y"), color=ANSI_WHITE, mode=mode)
+        notices = []
+        if row.notice:
+            notices.append(f"({MARK}{index})")
+        if row.date.weekday() == 0 or (row.date.weekday() > 3 and row.date.weekday() < 5):
+            notices.append("Langes Wochenende")
+        notice_formatted = ", ".join(notices)
+        date_formatted = termcolor(row.date.strftime("%d %b (%a)"), color=ANSI_WHITE, mode=mode)
         name_formatted = f"{row.name}{' ' * (max_indent-len(row.name))}"
         print(" ".join([date_formatted, name_formatted, notice_formatted]))
     return EXIT_OK
