@@ -28,9 +28,9 @@
     process = git-lfs filter-process
     required = true
 
-[pull]
-    rebase = true
+#[pull]
+#    rebase = true
 
-[user]
-    name = lukasjoc
-    email = 45790416+lukasjoc@users.noreply.github.com
+#[user]
+#    name = lukasjoc
+#    email = 45790416+lukasjoc@users.noreply.github.com
