@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ ! -d ".worktrees" ]]; then
+    echo ".worktrees dir doesnt exist. Make sure to create it.";
+    exit 1;
+fi
+
+branchname="$1";
+if [[ -z "$branchname" ]]; then
+    echo "Please provide a branch name for the new worktree.";
+    exit 1;
+fi
+
+git worktree add --track -b "$branchname" ".worktrees/$branchname"

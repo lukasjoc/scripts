@@ -21,6 +21,9 @@
     ch = checkout
     st = status
     diff = diff --patience
+    w = worktree
+    wls = worktree list
+    wrm = worktree remove
 
 [filter "lfs"]
     clean = git-lfs clean -- %f
