@@ -11,4 +11,8 @@ if [[ -z "$branchname" ]]; then
     exit 1;
 fi
 
-git worktree add --track -b "$branchname" ".worktrees/$branchname"
+if [[ $(git branch -avv | grep "$branchname") ]]; then
+    git worktree add ".worktrees/$branchname" "$branchname"
+else
+    git worktree add --track -b "$branchname" ".worktrees/$branchname"
+fi
