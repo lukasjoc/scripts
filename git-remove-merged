@@ -1,5 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 git fetch --all --prune --prune-tags --progress
-for br in $(git branch -vv | grep -E ': gone|entfernt]' | awk '{print $1}'); do git branch -D "$br"; done
 git worktree prune
+
+for br in $(git branch --format '%(refname:short) tracking:%(upstream:track)' | grep -E "\[gone\]" | awk '{print $1}'); do
+    if [[ $(git worktree list --porcelain | grep -we "$br") ]]; then
+        git worktree remove "$br"
+    fi
+    git branch -D "$br"
+done
