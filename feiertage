@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# REQUIREMENTS: Python >=3.4
+
 DESC="""
 A simple, *self contained* python3 script to list the german "feiertage" in a
 more readable format. This uses the feiertage-api API (https://feiertage-api.de/).
