@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -o vi
+
+# https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+shopt -s cdspell dirspell
+shopt -s checkhash
+shopt -s failglob
+shopt -u hostcomplete
+shopt -s cmdhist
+shopt -s histappend
+
+alias ..="cd ../"
+alias ll="ls -ls"
+alias ls="ls --author -bcFA --human-readable -N -S --color=auto"
+alias grep="grep --color=auto"
+alias watch="watch --color"
+alias clear="printf '\e[1;1H\e[2J'"
+
+bin2dec() { echo "obase=10;ibase=2;$1" | bc; }
+bin2hex() { echo "obase=10000;ibase=2;$1" | bc; }
+dec2bin() { echo "obase=2;$1" | bc; }
+
+pathadd() {
+    __doc__="overwrites path to PATH checking if path is in PATH before doing so.";
+
+    [[ ! "${PATH//:/ }" =~ "$1" && -d  $1 ]] \
+    && export PATH="$1:$PATH"
+}
+
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_DATA_BIN="$HOME/.local/bin"
+pathadd $XDG_DATA_BIN
+
+[[ -d "$HOME/.local/scripts/env-completion" ]]; source "$HOME/.local/scripts/env-completion";
+[[ -d "$HOME/.local/scripts/extra" ]]; source "$HOME/.local/scripts/extra/disable-capslock";
+
+pathadd "$HOME/.local/scripts/debian"
+pathadd "$HOME/.local/scripts/dist"
+pathadd "$HOME/.local/scripts"
+
+worktrees() {
+    __doc__="Fuzzy Find Selection that moves you into the selected worktree automatically."
+    [[ ! -d ".worktrees" ]] && echo ".worktrees directory doesnt exist" && return 1;
+    dest=$(find ".worktrees" -maxdepth 1 -type d -not -path ".worktrees" \
+    | fzf --no-input --cycle --no-multi-line --list-border block --header "Move to worktree");
+    [[ -d $d ]]; cd "$dest";
+}
