@@ -21,7 +21,7 @@ bin2hex() { echo "obase=10000;ibase=2;$1" | bc; }
 dec2bin() { echo "obase=2;$1" | bc; }
 
 __add_to_path_if_not_exists() {
-    [[ -d "$1" ]] && [[ ! ":$PATH:" =~ ":$1:" ]] && export PATH="$1:$PATH"
+    [[ -d "$1" ]] && [[ ! ":$PATH:" =~ :$1: ]] && export PATH="$1:$PATH"
 }
 
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -42,5 +42,5 @@ worktrees() {
     [[ ! -d ".worktrees" ]] && echo ".worktrees directory doesnt exist" && return 1;
     dest=$(find ".worktrees" -maxdepth 1 -type d -not -path ".worktrees" \
     | fzf --cycle --no-multi-line --list-border block --header "Move to worktree");
-    [[ -d $d ]]; cd "$dest"; tmux new -s "$dest"
+    cd "$dest" || return; tmux new -s "$(basename "$dest")"
 }
