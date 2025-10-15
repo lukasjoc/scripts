@@ -35,7 +35,7 @@ __add_to_path_if_not_exists "$HOME/.local/scripts/debian" # debian installers
 __add_to_path_if_not_exists "$HOME/.local/scripts/dist" # generic installers
 
 [[ -d "$HOME/.local/scripts/env-completion" ]]; source "$HOME/.local/scripts/env-completion";
-[[ -f "$HOME/.local/scripts/disable-capslock" ]]; source "$HOME/.local/scripts/disable-capslock"
+#[[ -f "$HOME/.local/scripts/disable-capslock" ]]; source "$HOME/.local/scripts/disable-capslock"
 
 worktrees() {
     __doc__="Fuzzy Find Selection that moves you into the selected worktree automatically."

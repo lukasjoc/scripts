@@ -2,7 +2,7 @@
 
 set -ex
 
-GOVERS="1.24.0"
+GOVERS="1.25.1"
 
 if [[ -d "$HOME/.local/go" ]]; then
     mv "$HOME/.local/go" "$HOME/.local/go.back"
@@ -17,6 +17,7 @@ echo
 go version
 go env
 
+go install "golang.org/x/tools/gopls@latest"
 go install "golang.org/x/tools/cmd/stringer@latest"
 go install "golang.org/x/vuln/cmd/govulncheck@latest"
 go install "honnef.co/go/tools/cmd/staticcheck@latest"
